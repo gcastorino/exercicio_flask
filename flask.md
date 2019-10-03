@@ -1,6 +1,6 @@
 ## Exercícios
 
-1. Cri[Criando o projeto](#there_you_go2)
+1. [Criando o projeto](#there_you_go2)
 
 1. [Disponibilizando o formulário de contas](#form)
 
@@ -78,7 +78,7 @@
 
 
 
-## <a name="there_you_go2"></a>1. Disponibilizando o formulário
+## <a name="form"></a>1. Disponibilizando o formulário
 
 Take me where
 I guess markdown behaves quite similar to html. I will attach an example below;
