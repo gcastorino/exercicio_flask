@@ -1,10 +1,12 @@
 ## Exercícios
 
-1. Criando o projeto
+1. Cri[Criando o projeto](#there_you_go2)
+
+1. [Disponibilizando o formulário de contas](#form)
 
 
 
-## 1. Criando o projeto
+## <a name="there_you_go2"></a>1. Criando o projeto
 
 1. Abra o Pycharm, vá em `File -> New Project` e crie um novo projeto chamado `banco-web`.
 
@@ -30,6 +32,53 @@
 
     The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
     ```
+    Isso quer dizer que o flask está funcionando e não encontrou ninguém que responda a essa requisição.
+    
+1. No arquivo `__init__.py`, vamos criar uma função capaz de responder a requisição. Crie o método `ola_mundo()`:
+     ```python
+    # my_app/__init__.py
+    
+    app = Flask(__name__)
+    
+    def ola_mundo():
+        pass
+    
+    if __name__ == '__main__':   
+        app.run()
+    ```
+    
+1. Faça com que o método `ola_mundo()` retorne uma mensagem:
+   ```python
+    # my_app/__init__.py
+    
+    app = Flask(__name__)
+    
+    def ola_mundo():
+        return `olá, mundo com Flask!`
+    
+    if __name__ == '__main__':   
+        app.run()
+    ```
+    
+1. Use o decorator `@app_route` para definir uma rota para execução do método devolver a resposta. Vamos configurar a rota para `/`:
+ ```python
+    # my_app/__init__.py
+    
+    app = Flask(__name__)
+    
+    @app.route('/')
+    def ola_mundo():
+        return `olá, mundo com Flask!`
+    
+    if __name__ == '__main__':   
+        app.run()
+    ```
+    
+1. Rode novamente o arquivo `__init__.py` e acesse o endereço `http://localhost:5000/` e veja o que acontece.
+
+
+
+## <a name="there_you_go2"></a>1. Disponibilizando o formulário
 
 Take me where
 I guess markdown behaves quite similar to html. I will attach an example below;
