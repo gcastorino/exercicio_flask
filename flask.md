@@ -61,12 +61,12 @@
     ```
     
 1. Use o decorator `@app_route` para definir uma rota para execução do método devolver a resposta. Vamos configurar a rota para `/`:
- ```python
+    ```python
     # my_app/__init__.py
     
     app = Flask(__name__)
     
-    @app.route('/')
+    @app.route("/")
     def ola_mundo():
         return `olá, mundo com Flask!`
     
@@ -74,7 +74,8 @@
         app.run()
     ```
     
-1. Rode novamente o arquivo `__init__.py` e acesse o endereço `http://localhost:5000/` e veja o que acontece.
+    
+1. Rode novamente o arquivo `__init__.py` e acesse o endereço http://localhost:5000/ e veja o que acontece.
 
 
 
