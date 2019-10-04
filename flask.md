@@ -4,7 +4,7 @@
 
 1. [Disponibilizando o formulário de contas](#form2)
 
-
+1. [Organizando o projeto](#organizando)
 
 ## <a name="there_you_go2"></a>1. Criando o projeto
 
@@ -17,6 +17,7 @@
 1. No arquivo `__init__.py`, vamos criar uma instância da classe `Flask` e chamar o método `run()`:
     ```python
     # my_app/__init__.py
+    from flask import Flask
     
     app = Flask(__name__)
     
@@ -37,6 +38,7 @@
 1. No arquivo `__init__.py`, vamos criar uma função capaz de responder a requisição. Crie o método `ola_mundo()`:
      ```python
     # my_app/__init__.py
+    from flask import Flask
     
     app = Flask(__name__)
     
@@ -50,6 +52,7 @@
 1. Faça com que o método `ola_mundo()` retorne uma mensagem:
    ```python
     # my_app/__init__.py
+    from flask import Flask
     
     app = Flask(__name__)
     
@@ -63,23 +66,155 @@
 1. Use o decorator `@app_route` para definir uma rota para execução do método devolver a resposta. Vamos configurar a rota para `/`:
     ```python
     # my_app/__init__.py
+    from flask import Flask
     
     app = Flask(__name__)
     
     @app.route("/")
     def ola_mundo():
-        return `olá, mundo com Flask!`
+        return 'olá, mundo com Flask!'
     
     if __name__ == '__main__':   
         app.run()
     ```
     
     
-1. Rode novamente o arquivo `__init__.py` e acesse o endereço http://localhost:5000/ e veja o que acontece.
+1. Rode novamente o arquivo `__init__.py` e acesse o endereço `http://localhost:5000/` e veja o que acontece.
+
+
+## <a name="form2"></a>2. Disponibilizando o formulário de contas
+
+1. Na pasta `my_app` crie um diretório chamado `templates`.
+
+1. Entre no link do arquivos do curso(https://drive.google.com/drive/folders/1YtwKBjOHSKVidVKUTDdErfnYRtL9gjtf?usp=sharing) e faça o download da pasta `web` e extraia seu conteúdo para o `Desktop`.
+
+1. Copie o conteúdo pasta `html` da pasta `web` para a pasta `template` do projeto:
+    ```
+    my_app/
+        templates/
+            form.html
+            contas.html
+    ```
+1. Dentro da pasta `my_app` crie um diretório chamado `static`.
+
+1. Copie os arquivos da pasta `css` da pasta `web` para a pasta `static`do projeto:
+    ```
+    my_app/
+        templates/
+            form.html
+            contas.html
+        static/
+            bootstrap.min.css  
+    ```
+
+1. Agora vamos escrever uma rota para disponibilizar o formulário. No arquivo `__init__.py` crie o método `formulario()` decorato com `app.route` e defina a rota para `/form`:
+    ```python
+    # my_app/__init__.py
+    from flask import Flask
+    
+    app = Flask(__name__)
+    
+    @app.route("/")
+    def ola_mundo():
+        return 'olá, mundo com Flask!'
+    
+    @app.route("/form")
+    def formulario():
+        pass
+    
+    if __name__ == '__main__':   
+        app.run()
+    ```
+
+1. Para retornar o formulário, precisamos importar a função `render_template()` do módulo `flask`, responsável por renderizar a página do formulário como resposta:
+    ```python
+    # my_app/__init__.py
+    from flask import Flask, render_template
+    
+    app = Flask(__name__)
+    
+    @app.route("/")
+    def ola_mundo():
+        return 'olá, mundo com Flask!'
+    
+    @app.route("/form")
+    def formulario():
+        return render_template('form.html')
+    
+    if __name__ == '__main__':   
+        app.run()
+    ```
+
+1. Rode novamente o arquivo `__init__.py` e acesse o endereço `http://localhost:5000/form` pelo navegador. O formulário de contas deve aparecer como resposta.
+
+## <a name="organizando"></a>2. Organizando o projeto
+
+1. A aplicação pode vir a crescer e ter muitas rotas definidas. Não é uma boa prática deixar todas as rotas em um único arquivo. Vamos separar disponibilizadades. Na pasta `my_app`, crie um arquivo chamado `views.py`.
+
+1. Apague os método `ola_mundo()` e copie o método `formulario()` para o arquivo `views.py`:
+    ```python
+    # my_app/__init__.py
+    from flask import Flask, render_template
+    
+    app = Flask(__name__)
+    
+    if __name__ == '__main__':   
+        app.run()
+    ```
+    
+    ```python
+    # my_app/views.py
+    from flask import render_template
+    
+    @app.route("/form")
+    def formulario():
+        return render_template('form.html')
+    ```
+    
+1. Vamos modularizar o projeto com _blueprints_. Dentro do arquivo `views.py`, importe a classe `Blueprint` do módulo `flask`. Crie uma instância de `Bluenprint` chamada `contasbp` definida no contexto `"/contas":
+    ```python
+    # my_app/views.py
+    from flask import render_template, Blueprint
+    
+    contasbp = Blueprint('contas', __name__, url_prefix='/contas')
+    
+    @app.route("/form")
+    def formulario():
+        return render_template('form.html')
+    ```
+
+
+1. No decorador do método, troque `app` pela _blueprint_ criada:
+    ```python
+    # my_app/views.py
+    from flask import render_template, Blueprint
+    
+    contasbp = Blueprint('contas', __name__, url_prefix='/contas')
+    
+    @contasbp.route("/form")
+    def formulario():
+        return render_template('form.html')
+    ```
+    
+1. Agora precisamos registrar o contexto de nossa _blueprint_ na aplicação `flask`. No arquivo `__init__.py`, chame o método `register_blueprint()` do objeto `app` passando nossa `contasbp`. Não esqueça de importar `contasbp`do módulo `views`:
+    ```python
+    # my_app/__init__.py
+    from flask import Flask, render_template
+    from my_app.views import contasbp
+    
+    app = Flask(__name__)
+    app.register_blueprint(contasbp)
+    
+    if __name__ == '__main__':   
+        app.run()
+    ```
+    
+1. Rode novamente a aplicação e acesse o endereço `http://localhost:5000/contas/form` e veja que o formulário é disponibilizado como antes. Agora, usaremos o arquivo `views`para as rotas das contas.
 
 
 
-## <a name="form2"></a>2. Disponibilizando o formulário
+
+
 
 Take me where
 I guess markdown behaves quite similar to html. I will attach an example below;
