@@ -463,14 +463,14 @@ voltar ao [topo](#exercicios)
         numero = request.form.get('numero')
         titular = request.form.get('titular')
         saldo = float(request.form.get('saldo'))
-        limite = float(request.form.get('numero'))
+        limite = float(request.form.get('limite'))
         
         conta = Conta(numero, titular, saldo, limite)
         
         connetion = get_connection()
         
         sql = 'insert into contas (numero, titular, saldo, limite) values (%s, %s, %s, %s)'
-    valores = (conta.numero, conta.titular, conta.saldo, conta.limite)
+        valores = (conta.numero, conta.titular, conta.saldo, conta.limite)
 
         cursor = connction.cursor()
         cursor.execute(sql, valores)
