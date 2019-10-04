@@ -16,7 +16,7 @@
 
 ### flask-api
 
-1. [Configurando a API e refatorndo o projeto](#init_api)
+1. [Configurando a API e refatorando o projeto](#init_api)
 
 1. [Iniciando a API com flask-restplus](#restplus)
 
