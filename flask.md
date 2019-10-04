@@ -842,7 +842,7 @@ voltar ao [topo](#exercicios)
     # my_api/__init__.py
     from flask import Blueprint
     from flask_restplus import Api
-    from my_api.resources.conta_resource import ns as conta_resource
+   
     
     contas_api = Blueprint('api', __name__, url_prefix='/api')
     
@@ -850,10 +850,11 @@ voltar ao [topo](#exercicios)
           description='Api de Contas do curso PY-14')
     api.init_app(contas_api)
     
-
+    from my_api.resources.conta_resource import ns as conta_resource
     api.add_namespace(conta_resource, path='/contas')
     ```
-
+    No esqueça de trazer o import de `conta_resource` para baixo para evitar import circular.
+    
 1. Rode novamente o arquivo `run.py` e acesse o endereço `http://localhost:5000/api/contas`. Um erro acontece.
 
 1. Abra o console e veja a mensagem do erro:
