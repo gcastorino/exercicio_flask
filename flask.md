@@ -442,7 +442,7 @@ voltar ao [topo](#exercicios)
         
         conta = Conta(numero, titular, saldo, limite)
         
-        connetion = get_connection()
+        connection = get_connection()
     ```
 
 1. Agora que temos uma conexão aberta, podemos enviar o comando SQL para inserir uma conta em nossa tabela `contas` no banco de dados. Ao final, precisaremos confirmar a ação no banco de dados através do métoso `commit()` de `connection`:
@@ -467,15 +467,15 @@ voltar ao [topo](#exercicios)
         
         conta = Conta(numero, titular, saldo, limite)
         
-        connetion = get_connection()
+        connection = get_connection()
         
         sql = 'insert into contas (numero, titular, saldo, limite) values (%s, %s, %s, %s)'
         valores = (conta.numero, conta.titular, conta.saldo, conta.limite)
 
-        cursor = connction.cursor()
+        cursor = connection.cursor()
         cursor.execute(sql, valores)
         
-        connction.commit()
+        connection.commit()
         connection.close()
 
         return "conta cadastrada com sucesso"
