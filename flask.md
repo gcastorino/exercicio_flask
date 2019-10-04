@@ -727,7 +727,7 @@ voltar ao [topo](#exercicios)
         return "OK"
     ```
 
-1 Importe a _blueprint_ `contas_api` dentro do arquivo `run.py`:
+1. Importe a _blueprint_ `contas_api` dentro do arquivo `run.py`:
     ```python
     # banco_web/run.py
     from flask import Flask, render_template
