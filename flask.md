@@ -1,15 +1,19 @@
 ## Exercícios
 
-1. [Criando o projeto](#there_you_go2)
+### introdução ao Flask
 
-1. [Disponibilizando o formulário de contas](#form2)
+    1. [Criando o projeto](#there_you_go2)
 
-1. [Organizando o projeto](#organizando)
+    1. [Disponibilizando o formulário de contas](#form2)
 
-1. [Abrindo uma conexão com banco de dados](#connection)
+    1. [Organizando o projeto](#organizando)
 
-1. [Disponibilizando a lista de contas](#lista)
+    1. [Abrindo uma conexão com banco de dados](#connection)
 
+    1. [Disponibilizando a lista de contas](#lista)
+
+### flask-api
+    1. 
 ## <a name="there_you_go2"></a>1. Criando o projeto
 
 1. Abra o Pycharm, vá em `File -> New Project` e crie um novo projeto chamado `banco-web`.
@@ -275,7 +279,7 @@
     
 1. Rode novamente o arquivo `db.py` e a conexão deve ser aberta.
  
-## Inserindo uma conta no banco
+## <a name="connection"></a>4. Inserindo uma conta no banco
 
 1. Na pasta `my_app`, crie um arquivo chamado `models.py` e copie o conteúdo do arquivo `contas.py` da pasta `web` extraída para o `Desktop` em exercício anterior.
     ```python
