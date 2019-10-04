@@ -10,6 +10,8 @@
 
 1. [Abrindo uma conexão com banco de dados](#connection)
 
+1. [Inserindo um conta no banco](#insert)
+
 1. [Disponibilizando a lista de contas](#lista)
 
 ### flask-api
@@ -229,7 +231,7 @@ voltar ao [topo](#exercicios)
 
 
 
-## <a name="organizando"></a>4. Abrindo uma conexão com banco de dados
+## <a name="connection"></a>4. Abrindo uma conexão com banco de dados
 
 1. Precisamos instalar a dependência de um DB API para conexão com o bando de dados MySQL. Vamos utilizar o `mysql-connector-python` como driver de conexão. Vá em `Flie -> Settings -> Project:<nome-projeto> -> Project Interpreter`. No meu direito, procure por um símbolo de adição (`+`) e clique nele. No campo de busca procure por `mysql-connector-python` e clique em `Install Package`. Aguarde a conclusão da instalação, feche a janela e clique em `OK`
 
@@ -289,7 +291,7 @@ voltar ao [topo](#exercicios)
 
 voltar ao [topo](#exercicios)
 
-## <a name="connection"></a>4. Inserindo uma conta no banco
+## <a name="insert"></a>5 Inserindo uma conta no banco
 
 1. Na pasta `my_app`, crie um arquivo chamado `models.py` e copie o conteúdo do arquivo `contas.py` da pasta `web` extraída para o `Desktop` em exercício anterior.
     ```python
@@ -501,7 +503,7 @@ voltar ao [topo](#exercicios)
 
 voltar ao [topo](#exercicios)
 
-## <a name="lista"></a>5. Disponibilizando a lista de contas
+## <a name="lista"></a>6. Disponibilizando a lista de contas
 
 1. Agora vamos trazer todas as contas do banco e disponibilizar para o template `lista.html` mostrar os dados. Crie uma nova função chamada `lista_contas()` no arquivo `views.py` definida com a rota `/lista`.
     ```python
