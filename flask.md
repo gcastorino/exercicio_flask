@@ -89,7 +89,7 @@
     
 1. Rode novamente o arquivo `__init__.py` e acesse o endereço `http://localhost:5000/` e veja o que acontece.
 
-1. voltar ao [menu](#exercicios)
+voltar ao [topo](#exercicios)
 
 ## <a name="form2"></a>2. Disponibilizando o formulário de contas
 
@@ -155,6 +155,8 @@
     ```
 
 1. Rode novamente o arquivo `__init__.py` e acesse o endereço `http://localhost:5000/form` pelo navegador. O formulário de contas deve aparecer como resposta.
+
+voltar ao [topo](#exercicios)
 
 ## <a name="organizando"></a> 3. Organizando o projeto
 
@@ -279,7 +281,9 @@
     ```
     
 1. Rode novamente o arquivo `db.py` e a conexão deve ser aberta.
- 
+
+voltar ao [topo](#exercicios)
+
 ## <a name="connection"></a>4. Inserindo uma conta no banco
 
 1. Na pasta `my_app`, crie um arquivo chamado `models.py` e copie o conteúdo do arquivo `contas.py` da pasta `web` extraída para o `Desktop` em exercício anterior.
@@ -490,6 +494,8 @@
         
 1. Insira mais algumas contas no banco de dados para usarmos no próximo exercício.
 
+voltar ao [topo](#exercicios)
+
 ## <a name="lista"></a>5. Disponibilizando a lista de contas
 
 1. Agora vamos trazer todas as contas do banco e disponibilizar para o template `lista.html` mostrar os dados. Crie uma nova função chamada `lista_contas()` no arquivo `views.py` definida com a rota `/lista`.
@@ -552,6 +558,8 @@
     
 1. Rode novamente o arquivo `__init__.py` e adicione uma nova conta e veja que agora é redirecionado para a página de listagem das contas.
 
+
+voltar ao [topo](#exercicios)
 
 ## flask-api
 
