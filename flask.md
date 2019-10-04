@@ -524,11 +524,11 @@ voltar ao [topo](#exercicios)
     
     @contasbp.route('/lista')
     def lista_contas():
-        connetion = get_connection()
+        connection = get_connection()
         
         sql = 'select * from contas'
 
-        cursor = connction.cursor()
+        cursor = connection.cursor()
         cursor.execute(sql)
         resultado = cursor.fetchall()
        
@@ -772,13 +772,15 @@ voltar ao [topo](#exercicios)
 1. Agora vamos criar a nossa primeira rota. Segundo o protocolo HTTP, todo conteúdo que iremos disponibilizar é um recurso em nossa aplicação. O `flask-restplus` possui uma classe interna que define um recurso e criaremos um recurso para as nossas contas. Dentro da pasta `resources` crie o arquivo `conta_resource.py`.
 
 1. Dentro do arquivo `conta_resource.py`crie uma classe chamada `ContasResource`:
-    ```my_api/resources/conta_resource.py
+    ```python
+    # my_api/resources/conta_resource.py
     class ContasResource:
         pass
     ```
     
 1. Para definir métodos que serão mapeados com as rotas, devemos fazer nossa classe herdar da classe `Resoruce` do módulo `flask-restplus`:
-    ```my_api/resources/conta_resource.py
+    ```python
+    # my_api/resources/conta_resource.py
     from flask_restplus import Resource
     
     class ContasResource(Resource):
@@ -786,7 +788,8 @@ voltar ao [topo](#exercicios)
     ```
     
 1. Ao herdar da classe `Resource`, herdamos vários métodos pré-definidos dentro dela que expõe vários _endpoints_ de acordo com os mátodos do protocolo HTTP. A classe `Resource`, por sua vez, herda da classe `MethodView` do `flask`. Nossa primeira rota será para expor uma requisição utilizando o método `GET` do protocolo HTTP para disponibilizar uma lista de contas.
-    ```my_api/resources/conta_resource.py
+    ```python
+    # my_api/resources/conta_resource.py
     from flask_restplus import Resource
     
     class ContasResource(Resource):
@@ -796,7 +799,8 @@ voltar ao [topo](#exercicios)
     ```
     
 1. Vamos criar umas lista com algumas contas para retornar no método `get()` para testar:
-    ```my_api/resources/conta_resource.py
+    ```python
+    # my_api/resources/conta_resource.py
     from flask_restplus import Resource
     from my_api.models.conta import Conta
     
@@ -813,11 +817,12 @@ voltar ao [topo](#exercicios)
     ```
 
 1. Mas ainda precisamos definir uma rota. o contexto de nossa API já está configurado como `/api/` pela _blueprint_. Agora, precisamos registrar nosso recurso `ContasResource` em nossa api. Para isso, criaremos um namespace "/contas" para este recurso e incluiremos no objeto `api`. Para criar um namespace, utilizamos a classe `Namespace` do mádulo `flask-restplus`. O namespace definido será usado para definir a rota para nosso recurso com o decorator `ns.route()`:
-    ```my_api/resources/conta_resource.py
+    ```python
+    # my_api/resources/conta_resource.py
     from flask_restplus import Resource. Namespace
     from my_api.models.conta import Conta
     
-    ns = ns =  Namespace('contas', description='operações das contas')
+    ns =  Namespace('contas', description='operações das contas')
     
     conta1 = Conta('123-4', 'João', 1200.0, 1000.0, 1)
     conta2 = Conta('123-5', 'José', 1500.0, 1000.0, 2)
@@ -855,7 +860,7 @@ voltar ao [topo](#exercicios)
     ```python
     TypeError: Object of type 'Conta' is not JSON serializable
     ```
-    Ou seja, o objeto do tipo `COnta` não é serializável para o formato JSON.
+    Ou seja, o objeto do tipo `Conta` não é serializável para o formato JSON.
     
 1. Precisamos de uma maneira de converter nossos objetos do tipo conta para JSON. Como um dicionário tem uma estrutura parecida com um JSON, o Python possui um módulo chamado `json` que consegue fazer essa conversão. Basta adicionarmos um método que devolve nossa conta como um objeto do tipo funcionário ou usar seu `__dict__` interno para isso, mas nos daria muito trabalho toda vez para parsear o objeto. O `flask-restplus`já provê os recursos necessários para esta tarefa. Na pasta `utils`, criaremos o arquivo `serializers.py` e ensinaremos ao `flask-restplus`como queremos que nossa conta seja parseada para JSON:
     ```
@@ -873,13 +878,14 @@ voltar ao [topo](#exercicios)
     ```
     Através do método `model()` do objeto `api`, ensinamos os `flask-restplus` como uma conta deve ser parseada para JSON. O objeto `fileds` do módulo `flask-restplus` é bastante poderoso e podemos definir com precisão o tipo de cada atributo de nossa conta.
     
-1. Agor que já temos nosso conversor pronto, vamos pedir para o `flask-restplus`  converter a conta no retorno do método `get()` de nossa `ContasResoruces`. Para isso, usamos o decorador `marshal_with` passando o objeto `conta_dto`definido no módulo `serializers.py`:
-    ```my_api/resources/conta_resource.py
+1. Agora que já temos nosso conversor pronto, vamos pedir para o `flask-restplus`  converter a conta no retorno do método `get()` de nossa `ContasResoruces`. Para isso, usamos o decorador `marshal_with` passando o objeto `conta_dto`definido no módulo `serializers.py`:
+    ```python
+    # my_api/resources/conta_resource.py
     from flask_restplus import Resource. Namespace, marshal_with
     from my_api.models.conta import Conta
     from my_api.utils.serializers import conta_dto
     
-    ns = ns =  Namespace('contas', description='operações das contas')
+    ns =  Namespace('contas', description='operações das contas')
     
     conta1 = Conta('123-4', 'João', 1200.0, 1000.0, 1)
     conta2 = Conta('123-5', 'José', 1500.0, 1000.0, 2)
@@ -933,13 +939,13 @@ Para que a APi trabalhe com dados reais, precisamos adicionar algumas contas no 
     'Neither SQLALCHEMY_DATABASE_URI nor SQLALCHEMY_BINDS is set. '
     ```
     Faz sentido! Não tem como o SQLALchemy saber onde fica nosso banco de dados, ou mesmo qual o usuário e a senha para estabelecer uma conexão. Precisamos passar isso a ele, ou melhor, para o `flask` que está no controle na aplicação. A instância `app` de `FLask` possui vários atributos de configuração, dentre eles os de configuração do banco de dados. Por exemlo, podemos passar através do atributo `config` a url de conexão com o banco:
-    ```
+    ```python
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/banco_api'
     ```
     Mas qualquer outra configuração adicional que fizermos, lotaremos nosso módulo `run.py` com linhas de código de configurações. Por este motivo que optaremos por colocar todas as configurações em um arquivo chamado `config.py` na raiz da aplicação e em apenas uma linha definiremos todas as configurações contidas neste arquivo.
     
 1. Crie o arquivo `config.py`na raiz do projeto e acrescente a seguinte linha e código:
-    ```
+    ```python
     # banco_web/config.py
     
     # sql_alchemy
@@ -948,7 +954,7 @@ Para que a APi trabalhe com dados reais, precisamos adicionar algumas contas no 
     ```
 
 1. Acrescente a seguinte linha de código no arquivo `run.py` para definir as configurações de nosso arquivo `config.py`:
-    ```
+    ```python
     app.config.from_object('config') 
     ```
     
@@ -976,7 +982,7 @@ Para que a APi trabalhe com dados reais, precisamos adicionar algumas contas no 
     ```
 
 1. Agora nenhum erro aparece ao rodar novamente a aplicação. Com o SQLAlchemy configurado, vamos colocá-lo em ação. Vamos pedir que ele crie a tabela de contas na base de dados `banco_api`. Para isso, precisamos fazer com que nossa classe `Conta` herde da classe `Model` do SQLAlchemy:
-    ```
+    ```python
     #my_api/models.conta.py
     from run import db
     
@@ -985,13 +991,13 @@ Para que a APi trabalhe com dados reais, precisamos adicionar algumas contas no 
     ```
    
 1. Mas ao rodar a plaicação novamente recebemos um erro:
-    ```
+    ```python
     sqlalchemy.exc.ArgumentError: Mapper mapped class Conta->conta could not assemble any primary key columns for mapped table 'conta'
     ```
     Ou seja, o SQLAlchemy ñão conseguiu mapear nossa classe para um objeto que deve ser persistido pois ele não possui uma chave primária. Devemos avisar ao SQLAlchemy qual atributo deve ser a chave primária (que será o `id`).
     
 1. Para ensinar como queremos que nossa classe `Conta` seja persistida, devemos incluir as seguintes linhas dentro de nossa classe:
-    ```
+    ```python
      #my_api/models.conta.py
     from run import db
     from sqlalchemy import Column, Integer, String, Numeric
@@ -1085,7 +1091,7 @@ Para que a APi trabalhe com dados reais, precisamos adicionar algumas contas no 
     from my_api.models.conta import Conta
     from my_api.utils.serializers import conta_dto
     
-    ns = ns =  Namespace('contas', description='operações das contas')
+    ns =  Namespace('contas', description='operações das contas')
     
     conta1 = Conta('123-4', 'João', 1200.0, 1000.0, 1)
     conta2 = Conta('123-5', 'José', 1500.0, 1000.0, 2)
@@ -1133,7 +1139,7 @@ Para que a APi trabalhe com dados reais, precisamos adicionar algumas contas no 
     from my_api.models.conta import Conta
     from my_api.utils.serializers import conta_output_dto, conta_input_dto
     
-    ns = ns =  Namespace('contas', description='operações das contas')
+    ns =  Namespace('contas', description='operações das contas')
     
     conta1 = Conta('123-4', 'João', 1200.0, 1000.0, 1)
     conta2 = Conta('123-5', 'José', 1500.0, 1000.0, 2)
