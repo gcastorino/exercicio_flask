@@ -794,7 +794,7 @@ voltar ao [topo](#exercicios)
     
     class ContasResource(Resource):
         
-        def get():
+        def get(self):
             pass
     ```
     
@@ -812,7 +812,7 @@ voltar ao [topo](#exercicios)
     
     class ContasResource(Resource):
         
-        def get():
+        def get(self):
             return contas
     ```
 
@@ -833,7 +833,7 @@ voltar ao [topo](#exercicios)
     @ns.route("/")
     class ContasResource(Resource):
         
-        def get():
+        def get(self):
             return contas
     ```
 
@@ -898,7 +898,7 @@ voltar ao [topo](#exercicios)
     class ContasResource(Resource):
         
         @marshal_with(conta_dto)
-        def get():
+        def get(self):
             return contas
     ```
 
