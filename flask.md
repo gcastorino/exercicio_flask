@@ -13,7 +13,12 @@
 1. [Disponibilizando a lista de contas](#lista)
 
 ### flask-api
-    1. 
+
+1. [Configurando a API e refatorndo o projeto](#init_api)
+
+1.
+
+1. 
 ## <a name="projeto"></a>1. Criando o projeto
 
 1. Abra o Pycharm, vá em `File -> New Project` e crie um novo projeto chamado `banco-web`.
@@ -563,5 +568,183 @@ voltar ao [topo](#exercicios)
 
 ## flask-api
 
+## <a name="init_api"></a>1.Configurando a API e refatorando o projeto
+
+1. Vamos criar uma nova aplicação no projeto chamada de `my_api`. Na raiz do projeto crie um novo pacote chamado `my_api`. Com o cursor no projeto, clique com o botão direito do mouse e vá em `New -> Python Package. Nomeie o pacote com `my_api` e clique em `OK`.
+
+1. Como o projeto já possui uma instância de `flask`, vamos aproveitar a mesma para as duas aplicações (`my_app` e `my_api`). Crie o arquivo `run.py` na raiz do projeto. Esse arquivo será responsável por instanciar e rodar a aplicação.
+    ```
+    banco-web/
+     my_api/
+        __init__.py
+     my_app/
+        /templates
+        /static
+        __init__.py
+        db.py
+        models.py
+        views.py
+     run.py
+    ```
+
+1. Copie o conteúdo do arquivo `my_app/__init__.py` para o arquivo `run.py`:
+    ```python
+    # banco_web/run.py
+    from flask import Flask, render_template
+    from my_app.views import contasbp
+
+    app = Flask(__name__)
+    app.register_blueprint(contasbp)
+
+    if __name__ == '__main__':
+        app.run()
+    ```
+    Apague o conteúdo do arquivo `my_app/__init__.py`
+    
+1. Mas, ao fazer isso, nossa aplicação pára de funcionar já que o flask não encontra as pastas `templates` e `static`. Vamos ensinar ao `flask`encontrar essas pastas definindo os atributos `template_folder` e `static_url_path` de `app`:
+    ```python
+    # banco_web/run.py
+    from flask import Flask, render_template
+    from my_app.views import contasbp
+
+    app = Flask(__name__)
+    app.template_folder = "my_app/template
+    app.static_url_path = 'my_app/static' 
+    
+    app.register_blueprint(contasbp)
+
+    if __name__ == '__main__':
+        app.run()
+    ```
+    Obs.: Você também poderia arrastar as pastas `templates` e `static` para a raiz do projeto sem precisar configurar essas propriedades. Essa seria uma melhor solução caso mais de uma aplicação utilize templates em seu projeto.
+    
+1. Rode o arquivo `run.py` e veja se tudo funciona como antes.
+
+1. Agora vamos definir os diretórios do projeto de nossa `api`. Dentro da pasta `my_api` crie os diretórios `models`, `resources` e `utils`.
+    ```
+    my_api/
+        models/
+        resources/
+        utils/
+        __init__.py
+    ```
+    
+1. Dentro de models crie o arquivo `conta.py` e copie o conteúdo de `my_app/models` para o módulo `contas.py`
+     ```python
+    #my_api/models/conta.py
+    
+    class Conta:
+
+        def __init__(self, numero, titular, saldo, limite=1000.0, id=None):
+            self._id = id
+            self._numero = numero
+            self._titular = titular
+            self._saldo = saldo
+            self._limite = limite
+
+        @property
+        def id(self):
+            return self._id
+
+        @property
+        def numero(self):
+            return self._numero
+
+        @numero.setter
+        def numero(self, numero):
+            self._numero = numero
+
+        @property
+        def titular(self):
+            return self._titular.capitalize()
+
+        @titular.setter
+        def titular(self, titular):
+            self._titular = titular
+
+        @property
+        def saldo(self):
+            return self._saldo
+
+        @property
+        def limite(self):
+            return self._limite
+
+        @limite.setter
+        def limite(self, limite):
+            self._limite = limite
+
+        def deposita(self, valor):
+            self._saldo -= valor
+
+        def saca(self, valor):
+            self._saldo -= valor
+
+        def transfere_para(self, destino, valor):
+            self.saca(valor)
+            destino.deposita(valor)
+
+        def __str__(self):
+            return 'Conta: [id: {}, numero: {}, titular: {}, saldo: {}, limite: {}]'.format(self._id, self._numero, self._titular, self._saldo, self._limite)
+    ```
+
+1. Agora vamos criar a rota principal que definirá o contexto de nossa API. Assim como fizemos com nossa aplicação `my_app`, criaremos uma _blueprint_ para definir seu contexto no arquivo `run.py`:
+    ```python
+    # banco_web/run.py
+    from flask import Flask, render_template
+    from my_app.views import contasbp
+
+    app = Flask(__name__)
+    app.template_folder = "my_app/template
+    app.static_url_path = 'my_app/static' 
+    
+    app.register_blueprint(contasbp)
+    app.register_blueprint(contas_api)
+    
+    if __name__ == '__main__':
+        app.run()
+    ```
+
+1. Esse arquivo vai acusar erro já que não encontra a variável `contas_api`. Vamos inicializar essa _blueprint_ no arquivo `__init__.py` de `my_api`:
+    ```python
+    # my_api/__init__.py
+    from flask import Blueprint
+    
+    contas_api = Blueprint('api', __name__, url_prefix='/api')
+    ```
+    
+1. Vamos aproveitar e criar uma rota para testar se vai funcionar:
+    ```python
+    # my_api/__init__.py
+    from flask import Blueprint
+    
+    contas_api = Blueprint('api', __name__, url_prefix='/api')
+    
+    @contas_api.route("/")
+    def teste():
+        return "OK"
+    ```
+
+1 Importe a _blueprint_ `contas_api` dentro do arquivo `run.py`:
+     ```python
+    # banco_web/run.py
+    from flask import Flask, render_template
+    from my_app.views import contasbp
+    from my_api import contas_api
+    
+    app = Flask(__name__)
+    app.template_folder = "my_app/template
+    app.static_url_path = 'my_app/static' 
+    
+    app.register_blueprint(contasbp)
+    app.register_blueprint(contas_api)
+    
+    if __name__ == '__main__':
+        app.run()
+    ```
+
+1. Rode o arquivo `run.py` e acesse a endereço `http://localhost:5000/api/` e veja se a mensagem `OK` aparece na tela. 
+
+voltar ao [topo](#exercicios)
     
 
