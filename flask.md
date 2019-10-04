@@ -16,9 +16,9 @@
 
 1. [Configurando a API e refatorndo o projeto](#init_api)
 
-1.
+1. [Iniciando a API com flask-restplus](#restplus)
 
-1. 
+1. [Mostrando a lista do banco de dados](#sqlalchemy)
 ## <a name="projeto"></a>1. Criando o projeto
 
 1. Abra o Pycharm, vá em `File -> New Project` e crie um novo projeto chamado `banco-web`.
@@ -570,7 +570,7 @@ voltar ao [topo](#exercicios)
 
 ## <a name="init_api"></a>1.Configurando a API e refatorando o projeto
 
-1. Vamos criar uma nova aplicação no projeto chamada de `my_api`. Na raiz do projeto crie um novo pacote chamado `my_api`. Com o cursor no projeto, clique com o botão direito do mouse e vá em `New -> Python Package. Nomeie o pacote com `my_api` e clique em `OK`.
+1. Vamos criar uma nova aplicação no projeto chamada de `my_api`. Na raiz do projeto crie um novo pacote chamado `my_api`. Com o cursor no projeto, clique com o botão direito do mouse e vá em `New -> Python Package`. Nomeie o pacote com `my_api` e clique em `OK`.
 
 1. Como o projeto já possui uma instância de `flask`, vamos aproveitar a mesma para as duas aplicações (`my_app` e `my_api`). Crie o arquivo `run.py` na raiz do projeto. Esse arquivo será responsável por instanciar e rodar a aplicação.
     ```
@@ -726,7 +726,7 @@ voltar ao [topo](#exercicios)
     ```
 
 1 Importe a _blueprint_ `contas_api` dentro do arquivo `run.py`:
-     ```python
+    ```python
     # banco_web/run.py
     from flask import Flask, render_template
     from my_app.views import contasbp
@@ -747,4 +747,462 @@ voltar ao [topo](#exercicios)
 
 voltar ao [topo](#exercicios)
     
+## <a name="restplus"></a>2. Iniciando a API com flask-restplus
 
+1. Contaremos com a ajuda do pacote `flask-restplus` para construir nossa API. Precisamos adicionar esta dependência ao projeto. Vá em `File -> Settings -> Project:<nome-projeto> -> Project Interpreter`. No meu direito, procure por um símbolo de adição (`+`) e clique nele. No campo de busca procure por `flask-restplus` e clique em `Install Package`. Aguarde a conclusão da instalação, feche a janela e clique em `OK`.
+
+1. No arquivo `my_api/__init__.py`, apague o método de teste e crie uma instância de `Api` e inicie a api passando a _blueprint_ `contas_api`:
+    ```python
+    # my_api/__init__.py
+    from flask import Blueprint
+    from flask_restplus import Api
+    
+    contas_api = Blueprint('api', __name__, url_prefix='/api')
+    
+    api = Api(version='1.0', title='Contas API',
+          description='Api de Contas do curso PY-14')
+    api.init_app(contas_api)
+    ```
+    Não esqueça de importar `Api` do módulo `flask_restplut`.
+    
+1. Além de ajudar na construção de nossa API, o `flask-restplus` gera uma documetanção automática integrada com o Swagger. Rode novamentes a aplicação (`run.py`) e acesse o endereço `http://localhost:5000/api/` e veja o resultado. Deve aparecer a página da documentação com as informções que definimos no objeto `api`.
+
+1. Agora vamos criar a nossa primeira rota. Segundo o protocolo HTTP, todo conteúdo que iremos disponibilizar é um recurso em nossa aplicação. O `flask-restplus` possui uma classe interna que define um recurso e criaremos um recurso para as nossas contas. Dentro da pasta `resources` crie o arquivo `conta_resource.py`.
+
+1. Dentro do arquivo `conta_resource.py`crie uma classe chamada `ContasResource`:
+    ```my_api/resources/conta_resource.py
+    class ContasResource:
+        pass
+    ```
+    
+1. Para definir métodos que serão mapeados com as rotas, devemos fazer nossa classe herdar da classe `Resoruce` do módulo `flask-restplus`:
+    ```my_api/resources/conta_resource.py
+    from flask_restplus import Resource
+    
+    class ContasResource(Resource):
+        pass
+    ```
+    
+1. Ao herdar da classe `Resource`, herdamos vários métodos pré-definidos dentro dela que expõe vários _endpoints_ de acordo com os mátodos do protocolo HTTP. A classe `Resource`, por sua vez, herda da classe `MethodView` do `flask`. Nossa primeira rota será para expor uma requisição utilizando o método `GET` do protocolo HTTP para disponibilizar uma lista de contas.
+    ```my_api/resources/conta_resource.py
+    from flask_restplus import Resource
+    
+    class ContasResource(Resource):
+        
+        def get():
+            pass
+    ```
+    
+1. Vamos criar umas lista com algumas contas para retornar no método `get()` para testar:
+    ```my_api/resources/conta_resource.py
+    from flask_restplus import Resource
+    from my_api.models.conta import Conta
+    
+    conta1 = Conta('123-4', 'João', 1200.0, 1000.0, 1)
+    conta2 = Conta('123-5', 'José', 1500.0, 1000.0, 2)
+    conta3 = Conta('123-6', 'Maria', 2200.0, 1000.0, 3)
+
+    contas = [conta1, conta2, conta3] 
+    
+    class ContasResource(Resource):
+        
+        def get():
+            return contas
+    ```
+
+1. Mas ainda precisamos definir uma rota. o contexto de nossa API já está configurado como `/api/` pela _blueprint_. Agora, precisamos registrar nosso recurso `ContasResource` em nossa api. Para isso, criaremos um namespace "/contas" para este recurso e incluiremos no objeto `api`. Para criar um namespace, utilizamos a classe `Namespace` do mádulo `flask-restplus`. O namespace definido será usado para definir a rota para nosso recurso com o decorator `ns.route()`:
+    ```my_api/resources/conta_resource.py
+    from flask_restplus import Resource. Namespace
+    from my_api.models.conta import Conta
+    
+    ns = ns =  Namespace('contas', description='operações das contas')
+    
+    conta1 = Conta('123-4', 'João', 1200.0, 1000.0, 1)
+    conta2 = Conta('123-5', 'José', 1500.0, 1000.0, 2)
+    conta3 = Conta('123-6', 'Maria', 2200.0, 1000.0, 3)
+
+    contas = [conta1, conta2, conta3] 
+    
+    @ns.route("/")
+    class ContasResource(Resource):
+        
+        def get():
+            return contas
+    ```
+
+1. Agora precisamos importar o namespace criado para nosso arquivo `my_api/__init__.py` e registrá-lo no objeto `api` com a rota desejada através do método `add_namespace()`:
+    ```python
+    # my_api/__init__.py
+    from flask import Blueprint
+    from flask_restplus import Api
+    from my_api.resources.conta_resource import ns as conta_resource
+    
+    contas_api = Blueprint('api', __name__, url_prefix='/api')
+    
+    api = Api(version='1.0', title='Contas API',
+          description='Api de Contas do curso PY-14')
+    api.init_app(contas_api)
+    
+
+    api.add_namespace(conta_resource, path='/contas')
+    ```
+
+1. Rode novamente o arquivo `run.py` e acesse o endereço `http://localhost:5000/api/contas`. Um erro acontece.
+
+1. Abra o console e veja a mensagem do erro:
+    ```python
+    TypeError: Object of type 'Conta' is not JSON serializable
+    ```
+    Ou seja, o objeto do tipo `COnta` não é serializável para o formato JSON.
+    
+1. Precisamos de uma maneira de converter nossos objetos do tipo conta para JSON. Como um dicionário tem uma estrutura parecida com um JSON, o Python possui um módulo chamado `json` que consegue fazer essa conversão. Basta adicionarmos um método que devolve nossa conta como um objeto do tipo funcionário ou usar seu `__dict__` interno para isso, mas nos daria muito trabalho toda vez para parsear o objeto. O `flask-restplus`já provê os recursos necessários para esta tarefa. Na pasta `utils`, criaremos o arquivo `serializers.py` e ensinaremos ao `flask-restplus`como queremos que nossa conta seja parseada para JSON:
+    ```
+    #my_api/utils/serializers.py
+    from flask_restplus import fields
+    from my_api import api
+
+    conta_dto = api.model('conta', {
+        'id': fields.Integer,
+        'numero': fields.String,
+        'titular': fields.String,
+        'saldo': fields.Float,
+        'limite': fields.Float
+    })
+    ```
+    Através do método `model()` do objeto `api`, ensinamos os `flask-restplus` como uma conta deve ser parseada para JSON. O objeto `fileds` do módulo `flask-restplus` é bastante poderoso e podemos definir com precisão o tipo de cada atributo de nossa conta.
+    
+1. Agor que já temos nosso conversor pronto, vamos pedir para o `flask-restplus`  converter a conta no retorno do método `get()` de nossa `ContasResoruces`. Para isso, usamos o decorador `marshal_with` passando o objeto `conta_dto`definido no módulo `serializers.py`:
+    ```my_api/resources/conta_resource.py
+    from flask_restplus import Resource. Namespace, marshal_with
+    from my_api.models.conta import Conta
+    from my_api.utils.serializers import conta_dto
+    
+    ns = ns =  Namespace('contas', description='operações das contas')
+    
+    conta1 = Conta('123-4', 'João', 1200.0, 1000.0, 1)
+    conta2 = Conta('123-5', 'José', 1500.0, 1000.0, 2)
+    conta3 = Conta('123-6', 'Maria', 2200.0, 1000.0, 3)
+
+    contas = [conta1, conta2, conta3] 
+    
+    @ns.route("/")
+    class ContasResource(Resource):
+        
+        @marshal_with(conta_dto)
+        def get():
+            return contas
+    ```
+
+1. Rode novamente o arquivo `run.py`, acesse `http://localhost:5000/api/contas` pelo navegador e veja que agora tudo funciona como esperado.
+
+1. Acesse a documentação pelo endereço `http://localhost:5000/api`. Clique em `contas` e veja que o _endpoint_ foi adicionado automaticamente e pode ser testado de maneira iterativa cicando em `Try it out` e `Execute`.
+    
+voltar ao [topo](#exercicios)
+
+## <a name="sqlalchemy"></a>3. Mostrando a lista do banco de dados.
+
+Para que a APi trabalhe com dados reais, precisamos adicionar algumas contas no banco de dados e, em seguida, buscá-las. Precisamos, como fizemos na outra aplicação, de uma conexão com o banco de dados e executar as queries necessárias. Vimos como isso dá muito trabalho e, portanto, vamos utilizar um framework para a parte de persitência chamado SQLAlchemy. Existe um pacote que faz a integração do SQLAlchemy com o Flask nos poupando trabalho repetitivo.
+
+1. Primeiro vamos instalar o pacote `flask-sqlalchemy`. Vá em `File -> Settings -> Project:<nome-projeto> -> Project Interpreter`. No meu direito, procure por um símbolo de adição (`+`) e clique nele. No campo de busca procure por `Flask-SQLAlchemy` e clique em `Install Package`. Aguarde a conclusão da instalação, feche a janela e clique em `OK`.
+
+1. No arquivo `run.py`, vamos cria uma instância de `SQLAlchemy`, classe chave para iniciar a camada de persitência da aplicação dentro do contexto do `flask`:  
+    ```python
+    # banco_web/run.py
+    from flask import Flask, render_template
+    from my_app.views import contasbp
+    from my_api import contas_api
+    from flask_sqlalchemy import SQLAlchemy  
+    
+    app = Flask(__name__)
+    app.template_folder = "my_app/template
+    app.static_url_path = 'my_app/static' 
+    
+    app.register_blueprint(contasbp)
+    app.register_blueprint(contas_api)
+    
+    db = SQLAlchemy(app) 
+    
+    if __name__ == '__main__':
+        app.run()
+    ```
+
+1. Mas ao rodar novamente o módulo `run.py` recebemos um erro:
+    ```python
+    'Neither SQLALCHEMY_DATABASE_URI nor SQLALCHEMY_BINDS is set. '
+    ```
+    Faz sentido! Não tem como o SQLALchemy saber onde fica nosso banco de dados, ou mesmo qual o usuário e a senha para estabelecer uma conexão. Precisamos passar isso a ele, ou melhor, para o `flask` que está no controle na aplicação. A instância `app` de `FLask` possui vários atributos de configuração, dentre eles os de configuração do banco de dados. Por exemlo, podemos passar através do atributo `config` a url de conexão com o banco:
+    ```
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/banco_api'
+    ```
+    Mas qualquer outra configuração adicional que fizermos, lotaremos nosso módulo `run.py` com linhas de código de configurações. Por este motivo que optaremos por colocar todas as configurações em um arquivo chamado `config.py` na raiz da aplicação e em apenas uma linha definiremos todas as configurações contidas neste arquivo.
+    
+1. Crie o arquivo `config.py`na raiz do projeto e acrescente a seguinte linha e código:
+    ```
+    # banco_web/config.py
+    
+    # sql_alchemy
+    SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://root@localhost:3306/banco_api"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    ```
+
+1. Acrescente a seguinte linha de código no arquivo `run.py` para definir as configurações de nosso arquivo `config.py`:
+    ```
+    app.config.from_object('config') 
+    ```
+    
+    Por fim, nosso código ficará assim:
+    ```python
+    # banco_web/run.py
+    from flask import Flask, render_template
+    from my_app.views import contasbp
+    from my_api import contas_api
+    from flask_sqlalchemy import SQLAlchemy  
+    
+    app = Flask(__name__)
+    app.config.from_object('config') 
+    
+    app.template_folder = "my_app/template
+    app.static_url_path = 'my_app/static' 
+    
+    app.register_blueprint(contasbp)
+    app.register_blueprint(contas_api)
+    
+    db = SQLAlchemy(app) 
+    
+    if __name__ == '__main__':
+        app.run()
+    ```
+
+1. Agora nenhum erro aparece ao rodar novamente a aplicação. Com o SQLAlchemy configurado, vamos colocá-lo em ação. Vamos pedir que ele crie a tabela de contas na base de dados `banco_api`. Para isso, precisamos fazer com que nossa classe `Conta` herde da classe `Model` do SQLAlchemy:
+    ```
+    #my_api/models.conta.py
+    from run import db
+    
+    class Conta(db.Model):
+        # código omitido
+    ```
+   
+1. Mas ao rodar a plaicação novamente recebemos um erro:
+    ```
+    sqlalchemy.exc.ArgumentError: Mapper mapped class Conta->conta could not assemble any primary key columns for mapped table 'conta'
+    ```
+    Ou seja, o SQLAlchemy ñão conseguiu mapear nossa classe para um objeto que deve ser persistido pois ele não possui uma chave primária. Devemos avisar ao SQLAlchemy qual atributo deve ser a chave primária (que será o `id`).
+    
+1. Para ensinar como queremos que nossa classe `Conta` seja persistida, devemos incluir as seguintes linhas dentro de nossa classe:
+    ```
+     #my_api/models.conta.py
+    from run import db
+    from sqlalchemy import Column, Integer, String, Numeric
+    
+    class Conta(db.Model):   
+    
+        _id = Column('id', Integer(), primary_key=True)
+        _numero = Column('numero', String(255), nullable=False, unique=True)
+        _titular = Column('titular', String(255), nullable=False)
+        _saldo = Column('saldo', Numeric(), nullable=False)
+        _limite = Column('limite', Numeric(), nullable=False)
+        
+        # restante do código omitido
+    ```
+    Dessa maneira o SQLAlchemy sabe como queremos salvar cada atributo no banco, com seu respectivo tipo e regras de nulidade ou unicidade.
+    
+1. Mas isso não basta para que ele crie a tabela. Precisamos pedir para ele criar tudo e confirmar as ações no banco com o método `create_all()`:
+    ```python
+    # banco_web/run.py
+    from flask import Flask, render_template
+    from my_app.views import contasbp
+    from my_api import contas_api
+    from flask_sqlalchemy import SQLAlchemy  
+    
+    app = Flask(__name__)
+    app.config.from_object('config') 
+    
+    app.template_folder = "my_app/template
+    app.static_url_path = 'my_app/static' 
+    
+    app.register_blueprint(contasbp)
+    app.register_blueprint(contas_api)
+    
+    db = SQLAlchemy(app) 
+    db.create_all()
+    
+    if __name__ == '__main__':
+        app.run()
+    ```
+1. Mas aqui teremos problemas com import circulares. Vamos isolar a criação da instância de `SQLAlchemy` para outro módulo chamdo de `database.py` dentro do diretório raiz:
+    ```
+    # bancoweb/database.py
+    from flask_sqlalchemy import SQlAlchemy
+    
+    db = SQLAlchemy()
+    ```
+    
+1. E isolamos a criação da aplicação em um método `create_app()` e a inicialização do banco apenas de o contexto da aplicação existir em um método `setup_database()`: 
+     ```python
+    # banco_web/run.py
+    from flask import Flask, render_template
+    from my_app.views import contasbp
+    from my_api import contas_api
+    from database import db  
+    
+    def create_app():
+        app = Flask(__name__)
+        app.config.from_object('config') 
+        
+        db.init_app(app)
+        
+        app.template_folder = "my_app/template
+        app.static_url_path = 'my_app/static' 
+    
+        app.register_blueprint(contasbp)
+        app.register_blueprint(contas_api)
+    
+    def setup_database(app):
+        with app.app_context():
+            db.create_all()
+        
+    if __name__ == '__main__':
+        app = create_app()
+        setup_database(app)
+        app.run()
+    ```
+    Não esqueça de modificar o import de `db` no módulo `conta.py`.
+    
+1. Mas ao rodar recebemos outro erro:
+    ```
+    sqlalchemy.exc.ProgrammingError: (mysql.connector.errors.ProgrammingError) 1049 (42000): Unknown database 'banco_api'
+    ```
+    Ou seja, não encontrou a base de dados `banco_api`. Precisamos criá-la no banco de dados e rodar novamente.
+    
+1. Acesse o MySQL, crie uma base de dados chamada `banco_api` e rode novamente a aplicação.
+
+1. Precisamos executar alguma operação para que o SQLAlchemy abra uma conexão. Vamos criar o método `post()` em nossa `ContasResource` par definir a ação de criação de uma nova conta:
+    ```python
+    my_api/resources/conta_resource.py
+    from flask_restplus import Resource. Namespace, marshal_with
+    from my_api.models.conta import Conta
+    from my_api.utils.serializers import conta_dto
+    
+    ns = ns =  Namespace('contas', description='operações das contas')
+    
+    conta1 = Conta('123-4', 'João', 1200.0, 1000.0, 1)
+    conta2 = Conta('123-5', 'José', 1500.0, 1000.0, 2)
+    conta3 = Conta('123-6', 'Maria', 2200.0, 1000.0, 3)
+
+    contas = [conta1, conta2, conta3] 
+    
+    @ns.route("/")
+    class ContasResource(Resource):
+        
+        @marshal_with(conta_dto)
+        def get():
+            return contas
+            
+        def post():
+            pass
+    ```
+    
+1. Este método deve pegar os atributos da requisição como fizemos na aplicação anterior. Mas os atributos não chegam mais via formulário mas em formato JSON. Novamente, devemos ensinar ao flask como esperamos receber este objeto. Dentro do arquivo serializar, crie o modelo esperado do json em uma variável `conta_input_dto`. E modifique o anterior para `conta_output_dto`:
+    ```python
+    # my_api/utils/serializers.py
+    from flask_restplus import fields
+    from my_api import api
+
+    conta_output_dto = api.model('conta', {
+        'id': fields.Integer,
+        'numero': fields.String,
+        'titular': fields.String,
+        'saldo': fields.Float,
+        'limite': fields.Float
+    })
+
+    conta_input_dto = api.model('conta', {
+        'numero': fields.String,
+        'titular': fields.String,
+        'saldo': fields.Float,
+        'limite': fields.Float
+    })
+    ```
+  
+1. No arquivo `conta_resource.py` arrume os imports da módulo `serializer.py` e utilize  decorator `ns.expect()` passando o DTO de input para avisar que espermos esse objeto pela request:
+    ```python
+    my_api/resources/conta_resource.py
+    from flask_restplus import Resource. Namespace, marshal_with
+    from my_api.models.conta import Conta
+    from my_api.utils.serializers import conta_output_dto, conta_input_dto
+    
+    ns = ns =  Namespace('contas', description='operações das contas')
+    
+    conta1 = Conta('123-4', 'João', 1200.0, 1000.0, 1)
+    conta2 = Conta('123-5', 'José', 1500.0, 1000.0, 2)
+    conta3 = Conta('123-6', 'Maria', 2200.0, 1000.0, 3)
+
+    contas = [conta1, conta2, conta3] 
+    
+    @ns.route("/")
+    class ContasResource(Resource):
+        
+        @marshal_with(conta_output_dto)
+        def get():
+            return contas
+        
+        @ns.expect(conta_input_dto)
+        def post():
+            pass
+    ```
+
+1. Import o objeto `request` de `flask-restplus` e utilize o método `get_json()` para obter os parametros da requiição. Depois construa uma conta com os parâmetros e chame o método `add()` do objeto `session` do `SQLAlchemy` para adicionar uma conta no banco. Não esqueça de chamar o `comiit()` para confirmar a operação.
+    ```python
+    @ns.route("/")
+    class ContasResource(Resource):
+        
+        @marshal_with(conta_output_dto)
+        def get():
+            return contas
+            
+        @marhal_with(conta_output_dto)
+        @ns.expect(conta_input_dto)
+        def post():
+            data = request.get_json()
+            numero = data.get('numero')
+            titular = data.get('titular')
+            saldo = float(data.get('saldo'))
+            limite = float(data.get('limite'))
+
+            conta = Conta(numero, titular, saldo, limite)
+
+            db.session.add(conta)
+            db.session.commit()
+            return conta
+    ```
+
+1. Rode novamente o arquivo `run.py`, acesse o endreço `http://localhost:5000/api/` e acesse o método `POST`da `conta` na documentação do swagger. Teste inserir uma conta por lá.
+
+1. Modifique o método `get()` de `ContasResource` para que ele retorne a lista das contas no banco de dados:
+    ```python
+    @ns.route("/")
+    class ContasResource(Resource):
+        
+        @marshal_with(conta_output_dto)
+        def get():
+            return return Conta.query.all()
+        
+        @marhal_with(conta_output_dto)
+        @ns.expect(conta_input_dto)
+        def post():
+            data = request.get_json()
+            numero = data.get('numero')
+            titular = data.get('titular')
+            saldo = float(data.get('saldo'))
+            limite = float(data.get('limite'))
+
+            conta = Conta(numero, titular, saldo, limite)
+
+            db.session.add(conta)
+            db.session.commit()
+            
+            return conta
+    ```
+    Apague as contas e a lista de contas criadas no arquivo `conta_resource.py` já que não estamos mais utilizando.
+    
+voltar ao [topo](#exercicios)
