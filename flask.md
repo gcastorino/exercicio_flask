@@ -375,7 +375,7 @@ voltar ao [topo](#exercicios)
         numero = request.form.get('numero')
         titular = request.form.get('titular')
         saldo = float(request.form.get('saldo'))
-        limite = float(request.form.get('numero'))        
+        limite = float(request.form.get('limite'))        
     ```
     
     Não esqueça de converter os parâmetros `saldo`e `limite` para `float`.
@@ -393,7 +393,7 @@ voltar ao [topo](#exercicios)
         numero = request.form.get('numero')
         titular = request.form.get('titular')
         saldo = float(request.form.get('saldo'))
-        limite = float(request.form.get('numero'))
+        limite = float(request.form.get('limite'))
         
         conta = Conta(numero, titular, saldo, limite)
     ```
@@ -438,7 +438,7 @@ voltar ao [topo](#exercicios)
         numero = request.form.get('numero')
         titular = request.form.get('titular')
         saldo = float(request.form.get('saldo'))
-        limite = float(request.form.get('numero'))
+        limite = float(request.form.get('limite'))
         
         conta = Conta(numero, titular, saldo, limite)
         
