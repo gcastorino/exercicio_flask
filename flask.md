@@ -1,8 +1,8 @@
-## Exercícios
+## <a name="exercicios"></a>Exercícios
 
 ### introdução ao Flask
 
-1. [Criando o projeto](#there_you_go2)
+1. [Criando o projeto](#projeto)
 
 1. [Disponibilizando o formulário de contas](#form2)
 
@@ -14,7 +14,7 @@
 
 ### flask-api
     1. 
-## <a name="there_you_go2"></a>1. Criando o projeto
+## <a name="projeto"></a>1. Criando o projeto
 
 1. Abra o Pycharm, vá em `File -> New Project` e crie um novo projeto chamado `banco-web`.
 
@@ -89,6 +89,7 @@
     
 1. Rode novamente o arquivo `__init__.py` e acesse o endereço `http://localhost:5000/` e veja o que acontece.
 
+1. voltar ao [menu](#exercicios)
 
 ## <a name="form2"></a>2. Disponibilizando o formulário de contas
 
