@@ -2,15 +2,15 @@
 
 ### introdução ao Flask
 
-    1. [Criando o projeto](#there_you_go2)
+1. [Criando o projeto](#there_you_go2)
 
-    1. [Disponibilizando o formulário de contas](#form2)
+1. [Disponibilizando o formulário de contas](#form2)
 
-    1. [Organizando o projeto](#organizando)
+1. [Organizando o projeto](#organizando)
 
-    1. [Abrindo uma conexão com banco de dados](#connection)
+1. [Abrindo uma conexão com banco de dados](#connection)
 
-    1. [Disponibilizando a lista de contas](#lista)
+1. [Disponibilizando a lista de contas](#lista)
 
 ### flask-api
     1. 
